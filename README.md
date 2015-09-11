@@ -21,3 +21,6 @@ $pdo->table('xxx')->where('id',1)->delete();<br />
 更新和删除都做了安全处理，无where条件禁止操作。<br />
 如果需要删除全部<br />
 $pdo->table('xxx')->where(1,1)->update();<br />
+
+正在完善。。。。
+如果您有好的想法，或者有发现什么BUG，建议，欢迎联系我  persi@sixsir.com
