@@ -52,10 +52,8 @@ Class Db{
 
     final private function __construct(){
 
-        $this->_config = Yaf\Registry::get( 'config' )->dsn;
-
         try{
-            $this->_pdo = new PDO( $this->_config->type . ':dbname=' . $this->_config->db_name . ';host=' . $this->_config->host .';charset=' . $this->_config->charset , $this->_config->user , $this->_config->password );
+            $this->_pdo = new PDO( $this->_config['type'] . ':dbname=' . $this->_config['db_name'] . ';host=' . $this->_config['host'] , $this->_config['user'] , $this->_config['password'] );
             $this->_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->_pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             $this->_pdo->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
@@ -67,7 +65,11 @@ Class Db{
 
     }
 
-    public static function getInstance(){
+    public static function getInstance( array $config){
+
+        if( empty( $config ) )throw new SixException("请传入正确的数据库参数！", 1);
+
+        $this->_config = array_filter( $config );
 
         if( ! self::$_instance instanceof self ){
             self::$_instance = new self;
@@ -81,6 +83,8 @@ Class Db{
      */
     private function setPrefix( $prefix = '' ){
 
+        if( empty( $prefix ) )
+            self::$_prefix = 'utf8';
         self::$_prefix = $prefix;
         return $this;
     }
