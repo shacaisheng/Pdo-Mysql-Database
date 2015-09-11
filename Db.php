@@ -81,7 +81,7 @@ Class Db{
      * [setPrefix ]
      * @param string $prefix [string]
      */
-    private function setPrefix( $prefix = '' ){
+    private function setPrefix( string $prefix = '' ){
 
         if( empty( $prefix ) )
             self::$_prefix = 'utf8';
@@ -366,6 +366,7 @@ Class Db{
         $this->_buildLimit();
         $this->_buildOrder();
         $this->_buildGroup();
+        $this->_checkPdo();
         $this->_buildPrepare();
         $this->_buildParams();
         $this->_buildExecute();
@@ -415,6 +416,7 @@ Class Db{
 
     public function select(){
 
+        $this->_checkPdo();
         $this->_buildSelectQuery();
         return $this->_statement->fetchAll( PDO::FETCH_ASSOC );
 
@@ -422,6 +424,7 @@ Class Db{
 
     public function find(){
 
+        $this->_checkPdo();
         $this->_buildSelectQuery();
         return $this->_statement->fetch( PDO::FETCH_ASSOC );
 
@@ -434,6 +437,7 @@ Class Db{
     public function insert(){
 
         $this->_buildInsertQuery();
+        $this->_checkPdo();
         $this->_buildPrepare();
         $this->_buildParams();
         $this->_statement->execute();
@@ -446,11 +450,10 @@ Class Db{
 
     public function update(){
 
-        if( empty( $this->_where ) )
-            throw new SixException('UPDATE 条件为空，禁止更新！');
-
+        $this->__checkWhere();
         $this->_buildUpdateQuery();
         $this->_buildWhere();
+        $this->_checkPdo();
         $this->_buildPrepare();
         $this->_buildParams();
         $rowNum  = $this->_statement->execute();
@@ -461,11 +464,10 @@ Class Db{
 
     public function delete(){
 
-        if( empty( $this->_where ) )
-            throw new SixException('DELETE 条件为空，禁止删除！');
-
+        $this->__checkWhere();
         $this->_buildDeleteQuery();
         $this->_buildWhere();
+        $this->_checkPdo();
         $this->_buildPrepare();
         $this->_buildParams();
         $rowNum  = $this->_statement->execute();
@@ -490,6 +492,18 @@ Class Db{
         return false;
     }
 
+    private function _checkPdo(){
+
+        if( !$this->_pdo )throw new SixException("数据库连接失败!", 1);
+        return true;
+    }
+
+    private function _checkWhere(){
+
+        if( empty( $this->_where ) )
+            throw new SixException('DELETE 条件为空，禁止删除！');
+        return true;
+    }
     public function startTransaction(){
 
         $this->_pdo->beginTransaction();
